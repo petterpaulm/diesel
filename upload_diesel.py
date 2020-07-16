@@ -52,10 +52,10 @@ class CalculateAverages:
         input['DATA_INICIAL'] = pd.to_datetime([x.strftime('%Y-%m-01') for x in input['DATA_INICIAL']])
         diesel_comum_monthly = input.set_index(['DATA_INICIAL'])
         diesel_comum_monthly_avg = diesel_comum_monthly.groupby([diesel_comum_monthly.index, 'ESTADO', 'MUNICIPIO', 'PRODUTO']).mean().fillna(0).sort_index().reset_index()
-        diesel_comum_monthly_avg.to_csv(directory1 + '/diesel_monthly_' + product + '.csv', sep=';', index=False)
+        diesel_comum_monthly_avg.to_csv(directory1 + '/diesel_monthly_' + product + '.csv', sep=';', index=True)
         print(Style.COMPLEMENT2(f'Monthly Calculation for {product} is OK!'))
         diesel_comum_monthly_avg2 = diesel_comum_monthly.groupby([diesel_comum_monthly.index, 'PRODUTO']).mean().fillna(0).sort_index()
-        diesel_comum_monthly_avg2.to_csv(directory1 + '/diesel_monthly_avg_' + product + '.csv', sep=';', index=False)
+        diesel_comum_monthly_avg2.to_csv(directory1 + '/diesel_monthly_avg_' + product + '.csv', sep=';', index=True)
         print(Style.COMPLEMENT2(f'Monthly Average Calculation for {product} is OK!'))
 
     def generate_weekly(self, directory1):
@@ -65,7 +65,7 @@ class CalculateAverages:
                                 ['DATA_INICIAL', 'ESTADO', 'MUNICIPIO', 'PRODUTO',
                                  'PRECO_MEDIO_DE_REVENDA', 'PRECO_MEDIO_DE_DISTRIBUICAO']].groupby\
                 (['DATA_INICIAL', 'ESTADO', 'MUNICIPIO', 'PRODUTO']).apply(pd.DataFrame).reset_index(0).drop(columns=['index'])
-            diesel_weekly.to_csv(directory1 + '/diesel_weekly_' + i + '.csv', sep=';', index=False)
+            diesel_weekly.to_csv(directory1 + '/diesel_weekly_' + i + '.csv', sep=';', index=True)
             print(Style.COMPLEMENT2(f'Weekly Calculation for {i} is OK!'))
             self.generate_monthly(input=diesel_weekly, directory1=directory1, product=i)
 
@@ -74,7 +74,7 @@ class CalculateAverages:
                                 ['DATA_INICIAL', 'ESTADO', 'MUNICIPIO', 'PRODUTO',
                                  'PRECO_MEDIO_DE_REVENDA', 'PRECO_MEDIO_DE_DISTRIBUICAO']].groupby(['DATA_INICIAL', 'PRODUTO']).apply\
                 (pd.DataFrame).reset_index(0).reset_index(0).drop(columns=['index'])
-            diesel_weekly_avg.to_csv(directory1 + '/diesel_weekly_avg_' + i + '.csv', sep=';', index=False)
+            diesel_weekly_avg.to_csv(directory1 + '/diesel_weekly_avg_' + i + '.csv', sep=';', index=True)
             print(Style.COMPLEMENT2(f'Weekly Average Calculation for {i} is OK!'))
 
 if __name__=='__main__':
