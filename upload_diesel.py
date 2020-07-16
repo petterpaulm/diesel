@@ -1,19 +1,21 @@
 import pandas as pd
 import numpy as np
+import sys, os
 import cx_Oracle
 import datetime as dt
 
 class Style:
-    HEADER=lambda i:'\33[30m'+'\33[46m'+str(i)+'  '+'\33[0m'
-    COMPLEMENT=lambda i:'\033[31m'+str(i)+'\33[0m'
-    COMPLEMENT2=lambda i:'\33[36m'+str(i)+'\33[0m'
-    RESET=lambda i:'\33[0m'+str(i)
+    HEADER = lambda i: '\33[30m'+'\33[46m'+str(i)+'  '+'\33[0m'
+    COMPLEMENT = lambda i: '\033[31m'+str(i)+'\33[0m'
+    COMPLEMENT2 = lambda i: '\33[36m'+str(i)+'\33[0m'
+    RESET = lambda i: '\33[0m'+str(i)
 
 class UpdateDieselOutput:
     def __init__(self):
-        self.dsnStr=cx_Oracle.makedsn("xcp2client03-vip.la.corp.cargill.com", "1521", "pcssl")
-        self.conn=cx_Oracle.connect(user='LATAMCSSP', password='Airbusa330', dsn=self.dsnStr)
-        self.hoje=dt.date.today()
+        self.project_variables = os.environ
+        self.dsnStr = cx_Oracle.makedsn(self.project_variables['SERVER_LATAM'], self.project_variables['SERVER_LATAM_HOST'], self.project_variables['SERVER_LATAM_SID'])
+        self.conn = cx_Oracle.connect(user=self.project_variables['SERVER_LATAM_NAME'], password=self.project_variables['SERVER_LATAM_PASSWORD'], dsn=self.dsnStr)
+        self.hoje = dt.date.today()
 
     def load_table(self, link1):
         tbl1=pd.read_csv(link1, sep=";").fillna(0)
@@ -40,7 +42,7 @@ class UpdateDieselOutput:
         print(Style.HEADER('Dados Upados!!'))
 
 if __name__=='__main__':
-    UpdateDieselOutput().upload_data(link1="C:/Users/p119124/Documents/tabelaCompleta_Diesel_Jul20.csv")
+    UpdateDieselOutput().upload_data(link1=dir_path.replace('\\', '/') + '/tabelaCompleta_Diesel_Jull20.py')
 
 class CalculateAverages:
     def __init__(self, link1):
@@ -71,11 +73,10 @@ class CalculateAverages:
 
             diesel_weekly_avg = self.tbl1[self.tbl1['MUNICIPIO'].isin(['UBERLANDIA', 'GOIANIA', 'ITUMBIARA', 'RIOVERDE', 'PAULINIA', 'ILHEUS', 'CASTRO', 'BARREIRAS']) &
                                             self.tbl1['PRODUTO'].isin([i])].loc[:,
-                                ['DATA_INICIAL', 'ESTADO', 'MUNICIPIO', 'PRODUTO',
-                                 'PRECO_MEDIO_DE_REVENDA', 'PRECO_MEDIO_DE_DISTRIBUICAO']].groupby(['DATA_INICIAL', 'PRODUTO']).apply\
-                (pd.DataFrame).reset_index(0).reset_index(0).drop(columns=['index'])
+                                ['DATA_INICIAL', 'PRODUTO', 'PRECO_MEDIO_DE_REVENDA', 'PRECO_MEDIO_DE_DISTRIBUICAO']].groupby(['DATA_INICIAL', 'PRODUTO']).mean().fillna(0).sort_index()
             diesel_weekly_avg.to_csv(directory1 + '/diesel_weekly_avg_' + i + '.csv', sep=';', index=True)
             print(Style.COMPLEMENT2(f'Weekly Average Calculation for {i} is OK!'))
 
 if __name__=='__main__':
-    CalculateAverages(link1='C:/Users/p119124/Documents/tabelaCompleta_Diesel_Jul20.csv').generate_weekly(directory1="C:/Users/p119124/Documents/")
+    CalculateAverages(link1=dir_path.replace('\\', '/') + '/tabelaCompleta_Diesel_Jull20.py').generate_weekly(directory1=dir_path.replace('\\', '/'))
+
